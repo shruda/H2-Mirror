@@ -84,7 +84,7 @@ public class H2GeometryFactory implements IGeometryFactory {
     }
 
     @Override
-    public boolean isAssignableFrom(Object object) {
-        return object instanceof Geometry;
+    public boolean isAssignableFrom(Class geomClass) {
+        return Geometry.class.isAssignableFrom(geomClass);
     }
 }

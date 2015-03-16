@@ -1,7 +1,5 @@
 package org.h2.jts;
 
-import java.sql.SQLException;
-
 import org.h2.api.IEnvelope;
 import org.h2.api.IGeometry;
 import org.h2.message.DbException;

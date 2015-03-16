@@ -18,11 +18,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.util.AffineTransformation;
 
 import org.h2.api.Aggregate;
-import org.h2.api.IEnvelope;
-import org.h2.api.IGeometry;
-import org.h2.jts.H2Envelope;
-import org.h2.jts.H2Geometry;
-import org.h2.jts.H2GeometryFactory;
 import org.h2.test.TestBase;
 import org.h2.tools.SimpleResultSet;
 import org.h2.tools.SimpleRowSource;
@@ -589,7 +584,7 @@ public class TestSpatial extends TestBase {
 
     private void testGeometryDataType() {
         GeometryFactory geometryFactory = new GeometryFactory();
-        H2Geometry geometry = new H2Geometry(geometryFactory.createPoint(new Coordinate(0, 0)));
+        Geometry geometry = geometryFactory.createPoint(new Coordinate(0, 0));
         assertEquals(Value.GEOMETRY, DataType.getTypeFromClass(geometry.getClass()));
     }
 
@@ -656,11 +651,11 @@ public class TestSpatial extends TestBase {
         geometry.setSRID(27572);
         
         ValueGeometry valueGeometry =
-                ValueGeometry.get(new H2Geometry(geometry));
+                ValueGeometry.tryGet(geometry);
         Geometry geometry2 = geometryFactory.createPoint(new Coordinate(0, 0));
         geometry2.setSRID(5326);
         ValueGeometry valueGeometry2 =
-                ValueGeometry.get(new H2Geometry(geometry2));
+                ValueGeometry.tryGet(geometry2);
         assertFalse(valueGeometry.equals(valueGeometry2));
         // Check illegal geometry (no WKB representation)
         try {

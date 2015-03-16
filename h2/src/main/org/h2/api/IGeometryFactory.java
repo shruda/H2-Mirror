@@ -58,9 +58,8 @@ public interface IGeometryFactory {
     public IGeometry toGeometry(IEnvelope envelope);
 
     /**
-     * @param object Object that could be wrapped by this factory.
-     * @return True if this object can be used as an argument of {@link #toGeometry(Object)}
+     * @param geomClass Object that could be wrapped by this factory.
+     * @return True if this object can be used as an argument of {@link #assignFrom(Object)}
      */
-    public boolean isAssignableFrom(Object object);
-
+    public boolean isAssignableFrom(Class<?> geomClass);
 }

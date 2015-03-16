@@ -919,7 +919,7 @@ public class DataType {
         } else if (Object[].class.isAssignableFrom(x)) {
             // this includes String[] and so on
             return Value.ARRAY;
-        } else if (IGeometry.class.isAssignableFrom(x)) {
+        } else if (IGeometry.class.isAssignableFrom(x) || ValueGeometry.isGeometryClass(x)) {
             return Value.GEOMETRY;
         } else {
             return Value.JAVA_OBJECT;
@@ -1020,8 +1020,8 @@ public class DataType {
             return ValueArray.get(x.getClass().getComponentType(), v);
         } else if (x instanceof Character) {
             return ValueStringFixed.get(((Character) x).toString());
-        } else if (x instanceof IGeometry) {
-            return ValueGeometry.get((IGeometry) x);
+        } else if (ValueGeometry.isGeometryClass(x.getClass())){
+            return ValueGeometry.tryGet(x);
         } else {
             return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
         }

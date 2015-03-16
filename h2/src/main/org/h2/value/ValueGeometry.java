@@ -115,9 +115,12 @@ public class ValueGeometry extends Value {
      * @return ValueGeometry instance if the argument is a Geometry, null otherwise
      */
     public static ValueGeometry tryGet(Object object) {
+        if(object instanceof IGeometry) {
+            return ValueGeometry.get((IGeometry) object);
+        }
         if(isInitialized()) {
             try {
-                if(GEOMETRY_FACTORY.isAssignableFrom(object)) {
+                if(GEOMETRY_FACTORY.isAssignableFrom(object.getClass())) {
                     return ValueGeometry.get(GEOMETRY_FACTORY.assignFrom(object));
                 } else {
                     return null;
@@ -128,6 +131,10 @@ public class ValueGeometry extends Value {
         } else {
             return null;
         }
+    }
+
+    public static boolean isGeometryClass(Class<?> classArg) {
+        return isInitialized() && (GEOMETRY_FACTORY.isAssignableFrom(classArg) || IGeometry.class.isAssignableFrom(classArg));
     }
 
     /**
@@ -264,7 +271,7 @@ public class ValueGeometry extends Value {
         }
         return super.convertTo(targetType);
     }
-    
+
     /**
      * Returns <code>true</code> if a IGeometryFactory is available and initialized.
      * @return
