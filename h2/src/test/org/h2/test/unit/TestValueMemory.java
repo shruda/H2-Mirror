@@ -195,7 +195,7 @@ public class TestValueMemory extends TestBase implements DataHandler {
         case Value.STRING_FIXED:
             return ValueStringFixed.get(randomString(random.nextInt(100)));
         case Value.GEOMETRY:
-            if (DataType.GEOMETRY_CLASS == null) {
+            if (!ValueGeometry.isInitialized()) {
                 return ValueNull.INSTANCE;
             }
             return ValueGeometry.get("POINT (" + random.nextInt(100) + " " +
