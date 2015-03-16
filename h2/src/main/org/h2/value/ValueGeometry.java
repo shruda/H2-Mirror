@@ -222,7 +222,7 @@ public class ValueGeometry extends Value {
 
     @Override
     public Object getObject() {
-        return getGeometry();
+        return getGeometry().getJDBCJavaObject();
     }
 
     @Override

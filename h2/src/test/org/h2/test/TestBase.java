@@ -727,26 +727,28 @@ public abstract class TestBase {
      * @param actual the actual value
      * @throws AssertionError if the values are not equal
      */
-    protected void assertEquals(String message, String expected, String actual) {
+    protected void assertEquals(String message, Object expected, Object actual) {
         if (expected == null && actual == null) {
             return;
         } else if (expected == null || actual == null) {
             fail("Expected: " + expected + " Actual: " + actual + " " + message);
         } else if (!expected.equals(actual)) {
-            int al = expected.length();
-            int bl = actual.length();
-            for (int i = 0; i < expected.length(); i++) {
-                String s = expected.substring(0, i);
-                if (!actual.startsWith(s)) {
-                    expected = expected.substring(0, i) + "<*>" + expected.substring(i);
+            String expectedString = expected.toString();
+            String actualString = actual.toString();
+            int al = expectedString.length();
+            int bl = actualString.length();
+            for (int i = 0; i < expectedString.length(); i++) {
+                String s = expectedString.substring(0, i);
+                if (!actualString.startsWith(s)) {
+                    expected = expectedString.substring(0, i) + "<*>" + expectedString.substring(i);
                     break;
                 }
             }
             if (al > 4000) {
-                expected = expected.substring(0, 4000);
+                expected = expectedString.substring(0, 4000);
             }
             if (bl > 4000) {
-                actual = actual.substring(0, 4000);
+                actual = actualString.substring(0, 4000);
             }
             fail("Expected: " + expected + " (" + al + ") actual: " + actual
                     + " (" + bl + ") " + message);
@@ -760,7 +762,7 @@ public abstract class TestBase {
      * @param actual the actual value
      * @throws AssertionError if the values are not equal
      */
-    protected void assertEquals(String expected, String actual) {
+    protected void assertEquals(Object expected, Object actual) {
         assertEquals("", expected, actual);
     }
 

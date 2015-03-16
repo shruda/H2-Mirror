@@ -130,7 +130,7 @@ public class TestSpatial extends TestBase {
                 new Coordinate(2, 2),
                 new Coordinate(1, 1) });
         
-        assertTrue(new H2Geometry(polygon).equals(rs.getObject(2)));
+        assertTrue(polygon.equals(rs.getObject(2)));
 
         rs = stat.executeQuery("select * from test where polygon = " +
                 "'POLYGON ((1 1, 1 2, 2 2, 1 1))'");
@@ -723,9 +723,8 @@ public class TestSpatial extends TestBase {
             assertEquals("geometry", rs.getMetaData().
                     getColumnTypeName(1).toLowerCase());
             assertTrue(rs.next());
-            assertTrue(rs.getObject(1) instanceof IGeometry);
-            assertTrue(new Envelope(1, 10, 1, 5).equals(
-                    ((IGeometry) rs.getObject(1)).getEnvelope().unwrap(Envelope.class)));
+            assertTrue(rs.getObject(1) instanceof Geometry);
+            assertEquals(new Envelope(1, 10, 1, 5), ((Geometry) rs.getObject(1)).getEnvelopeInternal());
             assertFalse(rs.next());
         } finally {
             conn.close();
@@ -737,7 +736,7 @@ public class TestSpatial extends TestBase {
      * An aggregate function that calculates the envelope.
      */
     public static class TableEnvelope implements Aggregate {
-        private Envelope tableEnvelope;
+        private Envelope tableEnvelope = new Envelope();
 
         @Override
         public int getInternalType(int[] inputTypes) throws SQLException {
@@ -756,18 +755,22 @@ public class TestSpatial extends TestBase {
 
         @Override
         public void add(Object value) throws SQLException {
-            if (value instanceof IGeometry) {
+            if (value instanceof Geometry) {
                 if (tableEnvelope == null) {
-                    tableEnvelope = ((IGeometry) value).getEnvelope().unwrap(Envelope.class);
+                    tableEnvelope = ((Geometry) value).getEnvelopeInternal();
                 } else {
-                    tableEnvelope.expandToInclude(((IGeometry) value).getEnvelope().unwrap(Envelope.class));
+                    tableEnvelope.expandToInclude(((Geometry) value).getEnvelopeInternal());
                 }
+            } else {
+
+                throw new SQLException("TableEnvelope accepts only Geometry values. Input: " +
+                        value.getClass().getSimpleName());
             }
         }
 
         @Override
         public Object getResult() throws SQLException {
-            return new H2Geometry(new GeometryFactory().toGeometry(tableEnvelope));
+            return new GeometryFactory().toGeometry(tableEnvelope);
         }
     }
 
@@ -816,9 +819,8 @@ public class TestSpatial extends TestBase {
                     "SELECT " + valueGeometry.getSQL());
             assertTrue(rs.next());
             Object obj = rs.getObject(1);
-            assertTrue(obj instanceof IGeometry);
-            ValueGeometry g = ValueGeometry.get((IGeometry) obj);
-            assertTrue("got: " + g + " exp: " + valueGeometry, valueGeometry.equals(g));
+            assertTrue(obj instanceof Geometry);
+            assertEquals(valueGeometry.getObject(), obj);
         } finally {
             conn.close();
         }
@@ -835,15 +837,15 @@ public class TestSpatial extends TestBase {
                     "SELECT 'POINT(1 1)'::geometry");
             assertTrue(rs.next());
             // Mutate the geometry
-            ((IGeometry) rs.getObject(1)).unwrap(Geometry.class).apply(new AffineTransformation(1, 0,
+            ((Geometry) rs.getObject(1)).apply(new AffineTransformation(1, 0,
                     1, 1, 0, 1));
             rs.close();
             rs = conn.createStatement().executeQuery(
                     "SELECT 'POINT(1 1)'::geometry");
             assertTrue(rs.next());
             // Check if the geometry is the one requested
-            assertEquals(1, ((IGeometry) rs.getObject(1)).unwrap(Point.class).getX());
-            assertEquals(1, ((IGeometry) rs.getObject(1)).unwrap(Point.class).getY());
+            assertEquals(1, ((Point) rs.getObject(1)).getX());
+            assertEquals(1, ((Point) rs.getObject(1)).getY());
             rs.close();
         } finally {
             conn.close();

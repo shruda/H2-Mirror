@@ -46,7 +46,12 @@ public class H2Geometry implements IGeometry {
 		return geometry.compareTo(g.unwrap(Geometry.class));
 	}
 
-	/**
+    @Override
+    public Object getJDBCJavaObject() {
+        return geometry;
+    }
+
+    /**
 	 * @see org.h2.value.IGeometry#getString()
 	 */
 	@Override

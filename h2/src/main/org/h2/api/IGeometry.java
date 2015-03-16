@@ -47,4 +47,6 @@ public interface IGeometry extends Comparable<IGeometry>, Cloneable, Wrapper{
     
     @Override
     public <T> T unwrap(Class<T> iface);
+
+    public Object getJDBCJavaObject();
 }
