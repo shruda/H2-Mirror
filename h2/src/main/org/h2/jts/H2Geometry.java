@@ -36,12 +36,8 @@ public class H2Geometry implements IGeometry {
 	 *             if the unwrap of {@link Geometry} is not possible.
 	 */
 	@Override
-	public int compareTo(IGeometry g) throws AssertionError {
-		if (!g.isWrapperFor(Geometry.class))
-			throw new AssertionError(
-					"Comparision isn't supported if 'com.vividsolutions.jts.geom.Geometry' can't be unwrapped!");
-
-		return geometry.compareTo(g.unwrap(Geometry.class));
+	public int compareTo(IGeometry g) {
+		return geometry.compareTo(g.getJDBCJavaObject());
 	}
 
     @Override
@@ -50,7 +46,7 @@ public class H2Geometry implements IGeometry {
     }
 
     /**
-	 * @see org.h2.value.IGeometry#getString()
+	 * @see org.h2.api.IGeometry#getString()
 	 */
 	@Override
 	public String getString() {
@@ -58,7 +54,7 @@ public class H2Geometry implements IGeometry {
 	}
 
 	/**
-	 * @see org.h2.value.IGeometry#getBytes()
+	 * @see org.h2.api.IGeometry#getBytes()
 	 */
 	@Override
 	public byte[] getBytes() {
@@ -75,7 +71,7 @@ public class H2Geometry implements IGeometry {
 	}
 
 	/**
-	 * @see org.h2.value.IGeometry#clone()
+	 * @see org.h2.api.IGeometry#clone()
 	 */
 	@Override
 	public IGeometry clone() {
@@ -83,7 +79,7 @@ public class H2Geometry implements IGeometry {
 	}
 
 	/**
-	 * @see org.h2.value.IGeometry#getEnvelope()
+	 * @see org.h2.api.IGeometry#getEnvelope()
 	 */
 	@Override
 	public IEnvelope getEnvelope() {

@@ -1021,7 +1021,12 @@ public class DataType {
         } else if (x instanceof Character) {
             return ValueStringFixed.get(((Character) x).toString());
         } else if (ValueGeometry.isGeometryClass(x.getClass())){
-            return ValueGeometry.tryGet(x);
+            ValueGeometry value = ValueGeometry.tryGet(x);
+            if(value != null) {
+                return value;
+            } else {
+                return ValueNull.INSTANCE;
+            }
         } else {
             return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
         }
