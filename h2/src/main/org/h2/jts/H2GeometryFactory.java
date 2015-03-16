@@ -20,7 +20,7 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class H2GeometryFactory implements IGeometryFactory {
 	/**
-	 * @see org.h2.value.IGeometryFactory#toGeometry(java.lang.String)
+	 * @see org.h2.api.IGeometryFactory#toGeometry(java.lang.String)
 	 */
 	@Override
 	public IGeometry toGeometry(String s) throws GeometryParseException {
@@ -32,7 +32,7 @@ public class H2GeometryFactory implements IGeometryFactory {
 	}
 
 	/**
-	 * @see org.h2.value.IGeometryFactory#toGeometry(java.lang.String, int)
+	 * @see org.h2.api.IGeometryFactory#toGeometry(java.lang.String, int)
 	 */
 	@Override
 	public IGeometry toGeometry(String s, int srid)
@@ -49,7 +49,7 @@ public class H2GeometryFactory implements IGeometryFactory {
 	}
 
 	/**
-	 * @see org.h2.value.IGeometryFactory#toGeometry(byte[])
+	 * @see org.h2.api.IGeometryFactory#toGeometry(byte[])
 	 */
 	@Override
 	public IGeometry toGeometry(byte[] bytes) throws GeometryParseException {
@@ -61,7 +61,7 @@ public class H2GeometryFactory implements IGeometryFactory {
 	}
 
 	/**
-	 * @see org.h2.value.IGeometryFactory#toGeometry(org.h2.value.IEnvelope)
+	 * @see org.h2.api.IGeometryFactory#toGeometry(org.h2.api.IEnvelope)
 	 */
 	@Override
 	public IGeometry toGeometry(IEnvelope envelope) {
@@ -73,4 +73,18 @@ public class H2GeometryFactory implements IGeometryFactory {
 		return new H2Geometry(
 				geometryFactory.toGeometry(envelope.unwrap(Envelope.class)));
 	}
+
+    @Override
+    public IGeometry assignFrom(Object object) throws GeometryParseException {
+        try {
+            return new H2Geometry((Geometry)object);
+        } catch (ClassCastException ex) {
+            throw new GeometryParseException(ex);
+        }
+    }
+
+    @Override
+    public boolean isAssignableFrom(Object object) {
+        return object instanceof Geometry;
+    }
 }

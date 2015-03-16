@@ -111,6 +111,26 @@ public class ValueGeometry extends Value {
     }
 
     /**
+     * @param object Any object
+     * @return ValueGeometry instance if the argument is a Geometry, null otherwise
+     */
+    public static ValueGeometry tryGet(Object object) {
+        if(isInitialized()) {
+            try {
+                if(GEOMETRY_FACTORY.isAssignableFrom(object)) {
+                    return ValueGeometry.get(GEOMETRY_FACTORY.assignFrom(object));
+                } else {
+                    return null;
+                }
+            } catch (GeometryParseException ex) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Get or create a geometry value for the given geometry.
      *
      * @param bytes the WKB representation of the geometry

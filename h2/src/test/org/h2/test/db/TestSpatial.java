@@ -576,12 +576,12 @@ public class TestSpatial extends TestBase {
      * @param srid the projection id
      * @return Geometry object
      */
-    public static IGeometry geomFromText(String text, int srid) throws SQLException {
+    public static Geometry geomFromText(String text, int srid) throws SQLException {
         WKTReader wktReader = new WKTReader();
         try {
             Geometry geom = wktReader.read(text);
             geom.setSRID(srid);
-            return new H2Geometry(geom);
+            return geom;
         } catch (ParseException ex) {
             throw new SQLException(ex);
         }

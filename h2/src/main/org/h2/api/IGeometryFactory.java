@@ -42,10 +42,25 @@ public interface IGeometryFactory {
     public IGeometry toGeometry(byte[] bytes) throws GeometryParseException;
 
     /**
+     * Create IGeometry instance from provided object
+     * @param object Object assignable using this factory {@link #isAssignableFrom(Object)}
+     * @return IGeometry instance
+     * @throws GeometryParseException If object cast failed
+     */
+    public IGeometry assignFrom(Object object) throws GeometryParseException;
+
+    /**
      * Creates a {@link IGeometry} instance by using the given parameters.
      * 
      * @param envelope the envelope
      * @return a new {@link IGeometry} instance
      */
     public IGeometry toGeometry(IEnvelope envelope);
+
+    /**
+     * @param object Object that could be wrapped by this factory.
+     * @return True if this object can be used as an argument of {@link #toGeometry(Object)}
+     */
+    public boolean isAssignableFrom(Object object);
+
 }

@@ -940,7 +940,12 @@ public class DataType {
             return ValueNull.INSTANCE;
         }
         if (type == Value.JAVA_OBJECT) {
-            return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
+            ValueGeometry geom = ValueGeometry.tryGet(x);
+            if (geom != null) {
+                return geom;
+            } else {
+                return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
+            }
         }
         if (x instanceof String) {
             return ValueString.get((String) x);
