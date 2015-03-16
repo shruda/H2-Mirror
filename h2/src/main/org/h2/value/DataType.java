@@ -637,11 +637,10 @@ public class DataType {
             }
             case Value.GEOMETRY: {
                 Object x = rs.getObject(columnIndex);
-                if (x == null || !(x instanceof IGeometry)) {
+                if (x == null || !(ValueGeometry.isGeometryClass(x.getClass()))) {
                     return ValueNull.INSTANCE;
                 }
-
-                return ValueGeometry.get((IGeometry) x);
+                return ValueGeometry.tryGet(x);
             }
             default:
                 throw DbException.throwInternalError("type="+type);

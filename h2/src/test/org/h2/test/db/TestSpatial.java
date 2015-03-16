@@ -684,6 +684,15 @@ public class TestSpatial extends TestBase {
             assertEquals("geometry",
                     columnMeta.getString("TYPE_NAME").toLowerCase());
             assertFalse(columnMeta.next());
+            ResultSet testData = stat.executeQuery("SELECT * FROM test");
+            try {
+                assertTrue(testData.next());
+                assertTrue(testData.getObject(1) instanceof Geometry);
+                assertEquals(1, ((Point) testData.getObject(1)).getX());
+                assertEquals(1, ((Point)testData.getObject(1)).getY());
+            } finally {
+                testData.close();
+            }
         } finally {
             conn.close();
         }
