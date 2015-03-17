@@ -41,10 +41,9 @@ public interface IGeometry extends Comparable<IGeometry>, Cloneable, Wrapper{
      * @return the bounding box
      */
     public IEnvelope getEnvelope();
-    
-    @Override
-    public boolean isWrapperFor(Class<?> iface);
-    
-    @Override
-    public <T> T unwrap(Class<T> iface);
+
+    /**
+     * @return Internal object returned when user call {@link java.sql.ResultSet#getObject(int)}
+     */
+    public Object getJDBCJavaObject();
 }

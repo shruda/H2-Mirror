@@ -33,7 +33,7 @@ public class ValueGeometry extends Value {
     private static final IGeometryFactory GEOMETRY_FACTORY;
 
     static {
-        ServiceLoader<IGeometryFactory> geometryFactories = ServiceLoader.load(IGeometryFactory.class);
+        ServiceLoader<IGeometryFactory> geometryFactories = ServiceLoader.load(IGeometryFactory.class, ValueGeometry.class.getClassLoader());
         Iterator<IGeometryFactory> geometryFactoryIterator = geometryFactories.iterator();
         GEOMETRY_FACTORY = geometryFactoryIterator.hasNext() ? geometryFactories.iterator().next() : null;
     }
@@ -108,6 +108,33 @@ public class ValueGeometry extends Value {
         } catch (GeometryParseException ex) {
             throw DbException.convert(ex);
         }
+    }
+
+    /**
+     * @param object Any object
+     * @return ValueGeometry instance if the argument is a Geometry, null otherwise
+     */
+    public static ValueGeometry tryGet(Object object) {
+        if(object instanceof IGeometry) {
+            return ValueGeometry.get((IGeometry) object);
+        }
+        if(isInitialized()) {
+            try {
+                if(GEOMETRY_FACTORY.isAssignableFrom(object.getClass())) {
+                    return ValueGeometry.get(GEOMETRY_FACTORY.assignFrom(object));
+                } else {
+                    return null;
+                }
+            } catch (GeometryParseException ex) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public static boolean isGeometryClass(Class<?> classArg) {
+        return isInitialized() && (GEOMETRY_FACTORY.isAssignableFrom(classArg) || IGeometry.class.isAssignableFrom(classArg));
     }
 
     /**
@@ -202,7 +229,7 @@ public class ValueGeometry extends Value {
 
     @Override
     public Object getObject() {
-        return getGeometry();
+        return getGeometry().getJDBCJavaObject();
     }
 
     @Override
@@ -244,7 +271,7 @@ public class ValueGeometry extends Value {
         }
         return super.convertTo(targetType);
     }
-    
+
     /**
      * Returns <code>true</code> if a IGeometryFactory is available and initialized.
      * @return

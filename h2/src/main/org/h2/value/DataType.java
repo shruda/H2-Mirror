@@ -637,11 +637,10 @@ public class DataType {
             }
             case Value.GEOMETRY: {
                 Object x = rs.getObject(columnIndex);
-                if (x == null || !(x instanceof IGeometry)) {
+                if (x == null || !(ValueGeometry.isGeometryClass(x.getClass()))) {
                     return ValueNull.INSTANCE;
                 }
-
-                return ValueGeometry.get((IGeometry) x);
+                return ValueGeometry.tryGet(x);
             }
             default:
                 throw DbException.throwInternalError("type="+type);
@@ -919,7 +918,7 @@ public class DataType {
         } else if (Object[].class.isAssignableFrom(x)) {
             // this includes String[] and so on
             return Value.ARRAY;
-        } else if (IGeometry.class.isAssignableFrom(x)) {
+        } else if (IGeometry.class.isAssignableFrom(x) || ValueGeometry.isGeometryClass(x)) {
             return Value.GEOMETRY;
         } else {
             return Value.JAVA_OBJECT;
@@ -940,7 +939,12 @@ public class DataType {
             return ValueNull.INSTANCE;
         }
         if (type == Value.JAVA_OBJECT) {
-            return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
+            ValueGeometry geom = ValueGeometry.tryGet(x);
+            if (geom != null) {
+                return geom;
+            } else {
+                return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
+            }
         }
         if (x instanceof String) {
             return ValueString.get((String) x);
@@ -1015,8 +1019,13 @@ public class DataType {
             return ValueArray.get(x.getClass().getComponentType(), v);
         } else if (x instanceof Character) {
             return ValueStringFixed.get(((Character) x).toString());
-        } else if (x instanceof IGeometry) {
-            return ValueGeometry.get((IGeometry) x);
+        } else if (ValueGeometry.isGeometryClass(x.getClass())){
+            ValueGeometry value = ValueGeometry.tryGet(x);
+            if(value != null) {
+                return value;
+            } else {
+                return ValueNull.INSTANCE;
+            }
         } else {
             return ValueJavaObject.getNoCopy(x, null, session.getDataHandler());
         }
