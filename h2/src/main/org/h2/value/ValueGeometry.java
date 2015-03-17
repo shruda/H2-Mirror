@@ -33,7 +33,7 @@ public class ValueGeometry extends Value {
     private static final IGeometryFactory GEOMETRY_FACTORY;
 
     static {
-        ServiceLoader<IGeometryFactory> geometryFactories = ServiceLoader.load(IGeometryFactory.class);
+        ServiceLoader<IGeometryFactory> geometryFactories = ServiceLoader.load(IGeometryFactory.class, ValueGeometry.class.getClassLoader());
         Iterator<IGeometryFactory> geometryFactoryIterator = geometryFactories.iterator();
         GEOMETRY_FACTORY = geometryFactoryIterator.hasNext() ? geometryFactories.iterator().next() : null;
     }
