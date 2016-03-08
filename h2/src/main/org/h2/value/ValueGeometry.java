@@ -18,6 +18,7 @@ import org.h2.util.StringUtils;
  * @author Thomas Mueller
  * @author Noel Grandin
  * @author Nicolas Fortin, Atelier SIG, IRSTV FR CNRS 24888
+ * @param <T> the type of the used framework geometry
  */
 public abstract class ValueGeometry<T> extends Value{
 
@@ -59,6 +60,10 @@ public abstract class ValueGeometry<T> extends Value{
      */
     public abstract T getGeometry();
 
+	/**
+	 * Returns the internal geometry instance which should be immutable.
+	 * @return the internal geometry instance which should be immutable
+	 */
 	@SuppressWarnings("unchecked")
 	public T getGeometryNoCopy() {
 		if (geometry == null) {
@@ -74,16 +79,49 @@ public abstract class ValueGeometry<T> extends Value{
      * @param r the other geometry
      * @return true if the two overlap
      */
-    public abstract boolean intersectsBoundingBox(ValueGeometry<T> r);
+	protected abstract boolean _intersectsBoundingBox(ValueGeometry<T> r);
 
+	 /**
+     * Test if this geometry envelope intersects with the other geometry
+     * envelope.
+     *
+     * @param r the other geometry
+     * @return true if the two overlap
+     */
+	@SuppressWarnings("unchecked")
+	public final boolean intersectsBoundingBox(ValueGeometry<?> r)
+	{
+		if(!getClass().isInstance(r)){
+			return false; // not supported and should never happen
+		}
+		
+		return _intersectsBoundingBox((ValueGeometry<T>) r);
+	}
+	
     /**
      * Get the union.
      *
      * @param r the other geometry
      * @return the union of this geometry envelope and another geometry envelope
      */
-    public abstract Value getEnvelopeUnion(ValueGeometry<T> r);
-
+    protected abstract Value _getEnvelopeUnion(ValueGeometry<T> r);
+    
+    /**
+     * Get the union.
+     *
+     * @param r the other geometry
+     * @return the union of this geometry envelope and another geometry envelope
+     */
+    @SuppressWarnings("unchecked")
+	public final Value getEnvelopeUnion(ValueGeometry<?> r)
+    {
+    	if(!getClass().isInstance(r)){
+			return ValueNull.INSTANCE; // not supported and should never happen
+		}
+    	
+    	return _getEnvelopeUnion((ValueGeometry<T>) r);
+    }
+    
     
     @Override
     public int getType() {
@@ -139,7 +177,8 @@ public abstract class ValueGeometry<T> extends Value{
         return getBytes().length * 20 + 24;
     }
     
-    public abstract boolean equals(Object other);
+    @Override
+	public abstract boolean equals(Object other);
 
 
     @Override
@@ -150,5 +189,10 @@ public abstract class ValueGeometry<T> extends Value{
         return super.convertTo(targetType);
     }
 
+    /**
+     * Returns the {@link SpatialKey} for the given row key. 
+     * @param id the row key
+     * @return the {@link SpatialKey} for the given row key
+     */
 	public abstract SpatialKey getSpatialKey(long id);
 }

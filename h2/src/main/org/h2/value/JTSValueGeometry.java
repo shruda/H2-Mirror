@@ -1,3 +1,8 @@
+/*
+ * Copyright 2004-2014 H2 Group. Multiple-Licensed under the MPL 2.0,
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
+ * Initial Developer: H2 Group
+ */
 package org.h2.value;
 
 import java.util.Arrays;
@@ -9,9 +14,14 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
 
+/**
+ * The {@link ValueGeometry} implementation for the JTS geometry framework.
+ * 
+ * @author Steve Hruda
+ */
 public class JTSValueGeometry extends ValueGeometry<Geometry> {
 
-	protected JTSValueGeometry(byte[] bytes, Geometry geometry) {
+	JTSValueGeometry(byte[] bytes, Geometry geometry) {
 		super(bytes, geometry);
 	}
 
@@ -21,13 +31,14 @@ public class JTSValueGeometry extends ValueGeometry<Geometry> {
 	}
 
 	@Override
-	public boolean intersectsBoundingBox(ValueGeometry<Geometry> r) {
+	public boolean _intersectsBoundingBox(ValueGeometry<Geometry> r) {
 		// the Geometry object caches the envelope
 		return getGeometryNoCopy().getEnvelopeInternal().intersects(
 				r.getGeometryNoCopy().getEnvelopeInternal());
 	}
 
-	public Value getEnvelopeUnion(ValueGeometry<Geometry> r) {
+	@Override
+	public Value _getEnvelopeUnion(ValueGeometry<Geometry> r) {
 		GeometryFactory gf = new GeometryFactory();
 		Envelope mergedEnvelope = new Envelope(getGeometryNoCopy().getEnvelopeInternal());
 		mergedEnvelope.expandToInclude(r.getGeometryNoCopy().getEnvelopeInternal());
